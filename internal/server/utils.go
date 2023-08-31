@@ -2,10 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
-	"strconv"
 )
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
@@ -29,15 +26,6 @@ func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
 			}
 		}
 	}
-}
-
-func getID(r *http.Request) (int, error) {
-	idStr := mux.Vars(r)["id"]
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return id, fmt.Errorf("invalid id given %s", idStr)
-	}
-	return id, nil
 }
 
 type LinkSegmentsToUserJSON struct {

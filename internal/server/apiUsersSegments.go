@@ -71,6 +71,10 @@ func (s *APIServer) handleLinkSegmentsToUser(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
+	linkSegmentsToUserResp := new(LinkSegmentsToUserJSON)
+
+	linkSegmentsToUserResp.ID = linkSegmentsToUserReq.ID
+
 	for _, v := range linkSegmentsToUserReq.SegmentsAdd {
 		segment, err := s.storage.GetSegment(v)
 		if err != nil {
@@ -80,21 +84,20 @@ func (s *APIServer) handleLinkSegmentsToUser(w http.ResponseWriter, r *http.Requ
 
 		getUsersSegments, err := s.storage.GetIdRefSegmentToUser(refUsersSegments)
 		if err == nil && getUsersSegments.Status != false {
-			return fmt.Errorf("add error: already exists active link segment %s to user %s",
-				v,
-				strconv.Itoa(refUsersSegments.UserId))
-		}
-
-		if err == nil && getUsersSegments.Status == false {
-			err = s.storage.UpdateRefSegmentToUser(getUsersSegments)
-			if err != nil {
-				return err
-			}
+			linkSegmentsToUserResp.SegmentsAdd = append(linkSegmentsToUserResp.SegmentsAdd, "already exists active link segment "+v)
 		} else {
-			err = s.storage.CreateRefSegmentToUser(refUsersSegments)
-			if err != nil {
-				return err
+			if err == nil && getUsersSegments.Status == false {
+				err = s.storage.UpdateRefSegmentToUser(getUsersSegments)
+				if err != nil {
+					return err
+				}
+			} else {
+				err = s.storage.CreateRefSegmentToUser(refUsersSegments)
+				if err != nil {
+					return err
+				}
 			}
+			linkSegmentsToUserResp.SegmentsAdd = append(linkSegmentsToUserResp.SegmentsAdd, "success link segment "+v)
 		}
 	}
 
@@ -107,16 +110,15 @@ func (s *APIServer) handleLinkSegmentsToUser(w http.ResponseWriter, r *http.Requ
 
 		getUsersSegments, err := s.storage.GetIdRefSegmentToUser(refUsersSegments)
 		if err != nil {
-			return fmt.Errorf("add error: doesn't exists link segment %s to user %s",
-				v,
-				strconv.Itoa(refUsersSegments.UserId))
-		}
-
-		err = s.storage.DeleteRefSegmentToUser(getUsersSegments)
-		if err != nil {
-			return err
+			linkSegmentsToUserResp.SegmentsDelete = append(linkSegmentsToUserResp.SegmentsDelete, "doesn't exists active link segment "+v)
+		} else {
+			err = s.storage.DeleteRefSegmentToUser(getUsersSegments)
+			if err != nil {
+				return err
+			}
+			linkSegmentsToUserResp.SegmentsDelete = append(linkSegmentsToUserResp.SegmentsDelete, "success unlink segment "+v)
 		}
 	}
 
-	return WriteJSON(w, http.StatusOK, map[string]string{"response": "OK"}) //CHANGE RESPONSE
+	return WriteJSON(w, http.StatusOK, linkSegmentsToUserResp) //CHANGE RESPONSE
 }

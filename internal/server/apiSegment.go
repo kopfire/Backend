@@ -4,6 +4,7 @@ import (
 	"AvitoBackend/internal/domain"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 )
@@ -31,7 +32,7 @@ func (s *APIServer) handleGetSegments(w http.ResponseWriter) error {
 }
 
 func (s *APIServer) handleCreateSegment(w http.ResponseWriter, r *http.Request) error {
-	createSegmentReq := new(domain.Segment)
+	createSegmentReq := new(domain.SegmentReqJSON)
 	if err := json.NewDecoder(r.Body).Decode(&createSegmentReq); err != nil {
 		return err
 	}
@@ -48,6 +49,32 @@ func (s *APIServer) handleCreateSegment(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		return err
+	}
+
+	if createSegmentReq.UserPercent != 0 {
+		users, err := s.storage.GetUsers()
+		if err != nil {
+			return err
+		}
+		countUser := len(users) * createSegmentReq.UserPercent / 100
+
+		set := make(map[int]bool)
+		for len(set) != countUser {
+			set[rand.Intn(len(users))] = true
+		}
+
+		for k := range set {
+			if err != nil {
+				return err
+			}
+			refUsersSegments := domain.NewRefUsersSegments(users[k].ID, segmentResp.ID)
+
+			err = s.storage.CreateRefSegmentToUser(refUsersSegments)
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
 	return WriteJSON(w, http.StatusOK, segmentResp)
