@@ -6,9 +6,9 @@ import (
 	"strconv"
 )
 
-func (s *PostgresStorage) createUserTable() error {
+func (s *PostgresStorage) CreateUserTable() error {
 	query := `CREATE TABLE if not exists users (
-    	id serial PRIMARY KEY,
+    	id SERIAL PRIMARY KEY,
         name VARCHAR(50))`
 
 	_, err := s.db.Exec(query)
@@ -28,14 +28,14 @@ func (s *PostgresStorage) CreateUser(user *domain.User) (*domain.User, error) {
 	return user, err
 }
 
+func (s *PostgresStorage) CreateUserById(user *domain.User) error {
+	query := `INSERT INTO users (id, name) VALUES ($1, $2)`
+	_, err := s.db.Query(query, user.ID, user.Name)
+	return err
+}
+
 func (s *PostgresStorage) DeleteUser(id int) error {
-	_, err := s.GetUser(id)
-
-	if err != nil {
-		return fmt.Errorf("doesn't exists %s", strconv.Itoa(id))
-	}
-
-	_, err = s.db.Query("DELETE FROM users WHERE id = $1", id)
+	_, err := s.db.Query("DELETE FROM users WHERE id = $1", id)
 	return err
 }
 

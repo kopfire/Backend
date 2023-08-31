@@ -39,3 +39,9 @@ func getID(r *http.Request) (int, error) {
 	}
 	return id, nil
 }
+
+type LinkSegmentsToUserJSON struct {
+	ID             int      `json:"id"`
+	SegmentsAdd    []string `json:"segments_add"`
+	SegmentsDelete []string `json:"segments_del"`
+}

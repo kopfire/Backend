@@ -36,7 +36,7 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	user := domain.NewUser(createUserReq.Name)
+	user := domain.NewUserByName(createUserReq.Name)
 
 	userResp, err := s.storage.CreateUser(user)
 
@@ -52,6 +52,12 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		return fmt.Errorf("invalid id given %s", idStr)
+	}
+
+	_, err = s.storage.GetUser(id)
+
+	if err != nil {
+		return fmt.Errorf("doesn't exists %s", strconv.Itoa(id))
 	}
 
 	if err := s.storage.DeleteUser(id); err != nil {

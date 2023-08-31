@@ -24,6 +24,8 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/segment", makeHTTPHandleFunc(s.handleSegment))
 	router.HandleFunc("/user", makeHTTPHandleFunc(s.handleUser))
+	router.HandleFunc("/linkSegmentsToUser", makeHTTPHandleFunc(s.handleUsersSegments))
+	router.HandleFunc("/getActiveSegmentsFromUser", makeHTTPHandleFunc(s.handleUsersSegments))
 
 	log.Println("Server running on port: ", s.listenAddr)
 

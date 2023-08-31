@@ -1,15 +1,20 @@
 package domain
 
+import "strconv"
+
 type User struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-func NewUserEmpty() *User {
-	return &User{}
+func NewUser(id int) *User {
+	return &User{
+		ID:   id,
+		Name: "test" + strconv.Itoa(id),
+	}
 }
 
-func NewUser(name string) *User {
+func NewUserByName(name string) *User {
 	return &User{
 		Name: name,
 	}

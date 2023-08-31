@@ -12,10 +12,20 @@ type Storage interface {
 	CreateSegment(*domain.Segment) (*domain.Segment, error)
 	DeleteSegment(string) error
 	GetSegments() ([]*domain.Segment, error)
+	GetSegment(string) (*domain.Segment, error)
+	GetSegmentById(int) (*domain.Segment, error)
 
 	CreateUser(*domain.User) (*domain.User, error)
+	CreateUserById(*domain.User) error
 	DeleteUser(int) error
 	GetUsers() ([]*domain.User, error)
+	GetUser(int) (*domain.User, error)
+
+	CreateRefSegmentToUser(*domain.RefUsersSegments) error
+	UpdateRefSegmentToUser(*domain.RefUsersSegments) error
+	DeleteRefSegmentToUser(*domain.RefUsersSegments) error
+	GetIdRefSegmentToUser(*domain.RefUsersSegments) (*domain.RefUsersSegments, error)
+	GetActiveSegmentByUserId(int) ([]*domain.RefUsersSegments, error)
 }
 
 type PostgresStorage struct {
@@ -44,11 +54,15 @@ func NewPostgresStorage() (*PostgresStorage, error) {
 }
 
 func (s *PostgresStorage) Init() error {
-	err := s.createSegmentTable()
+	err := s.CreateSegmentTable()
 	if err != nil {
 		return err
 	}
-	err = s.createUserTable()
+	err = s.CreateUserTable()
+	if err != nil {
+		return err
+	}
+	err = s.CreateRefUsersSegmentsTable()
 	if err != nil {
 		return err
 	}

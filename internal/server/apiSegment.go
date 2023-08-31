@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func (s *APIServer) handleSegment(w http.ResponseWriter, r *http.Request) error {
@@ -35,6 +36,12 @@ func (s *APIServer) handleCreateSegment(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
+	segmentGet, err := s.storage.GetSegment(createSegmentReq.Name)
+
+	if err == nil {
+		return fmt.Errorf("already exists id:%s, name:%s", strconv.Itoa(segmentGet.ID), segmentGet.Name)
+	}
+
 	segment := domain.NewSegment(createSegmentReq.Name)
 
 	segmentResp, err := s.storage.CreateSegment(segment)
@@ -48,6 +55,12 @@ func (s *APIServer) handleCreateSegment(w http.ResponseWriter, r *http.Request) 
 
 func (s *APIServer) handleDeleteSegment(w http.ResponseWriter, r *http.Request) error {
 	name := r.URL.Query().Get("name")
+
+	_, err := s.storage.GetSegment(name)
+
+	if err != nil {
+		return fmt.Errorf("doesn't exists %s", name)
+	}
 
 	if err := s.storage.DeleteSegment(name); err != nil {
 		return err
