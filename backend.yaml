@@ -1,0 +1,254 @@
+swagger: '2.0'
+info:
+  title: Пример API
+  description: Описание вашего API
+  version: 1.0.0
+host: localhost:9999
+basePath: /
+schemes:
+  - http
+paths:
+  /getActiveSegmentsFromUser:
+    get:
+      tags:
+        - LinkSegmentToUser
+      summary: Получить активные сегменты пользователя
+      description: Возвращает список активных сегментов, связанных с указанным пользователем.
+      parameters:
+        - name: id
+          in: query
+          description: Идентификатор пользователя
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: array
+            items:
+              type: string
+              example: test1
+        '400':
+          description: Ошибка при получении активных сегментов
+          schema:
+            type: object
+            properties:
+              Error:
+                type: string
+          examples:
+            badResponse:
+              value:
+                Error: doesn't exists 1004
+  /linkSegmentsToUser:
+    post:
+      tags:
+        - LinkSegmentToUser
+      summary: Связать сегменты с пользователем
+      description: Добавляет и удаляет сегменты связанные с пользователем.
+      parameters:
+        - name: requestBody
+          in: body
+          description: Запрос с данными о связываемых и отвязываемых сегментах.
+          required: true
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 100
+              segments_add:
+                type: array
+                items:
+                  type: string
+                  example: test1
+              segments_del:
+                type: array
+                items:
+                  type: string
+                  example: test2
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 100
+              segments_add:
+                type: array
+                items:
+                  type: string
+                  example: already exists active link segment test1
+              segments_del:
+                type: array
+                items:
+                  type: string
+                  example: success unlink segment test2
+        '400':
+          description: Ошибка при связывании/отвязывании сегментов
+          schema:
+            type: object
+            properties:
+              Error:
+                type: string
+  /segment:
+    get:
+      tags:
+        - Segment
+      summary: Получить список сегментов
+      description: Возвращает список сегментов.
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+        '400':
+          description: Некорректный запрос
+          schema:
+            type: object
+    post:
+      tags:
+        - Segment
+      summary: Создать сегмент
+      description: Создает новый сегмент.
+      parameters:
+        - name: body
+          in: body
+          description: Тело запроса
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              user_percent:
+                type: integer
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+        '400':
+          description: Ошибка при создании сегмента
+          schema:
+            type: object
+            properties:
+              Error:
+                type: string
+    delete:
+      tags:
+        - Segment
+      summary: Удалить сегмент
+      description: Удаляет указанный сегмент.
+      parameters:
+        - name: name
+          in: query
+          description: Имя сегмента
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: object
+            properties:
+              deleted:
+                type: string
+        '400':
+          description: Ошибка при удалении сегмента
+          schema:
+            type: object
+            properties:
+              Error:
+                type: string
+  /user:
+    get:
+      tags:
+        - User
+      summary: Получить список пользователей
+      description: Возвращает список пользователей
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+        '400':
+          description: Некорректный запрос
+          schema:
+            type: object
+    post:
+      tags:
+        - User
+      summary: Создать пользователя
+      description: Создает нового пользователя.
+      parameters:
+        - name: body
+          in: body
+          description: Тело запроса
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+        '400':
+          description: Ошибка при создании пользователя
+          schema:
+            type: object
+            properties:
+              Error:
+                type: string
+    delete:
+      tags:
+        - User
+      summary: Удалить пользователя
+      description: Удаляет указанного пользователя.
+      parameters:
+        - name: id
+          in: query
+          description: Идентификатор пользователя
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Успешный ответ
+          schema:
+            type: object
+            properties:
+              deleted:
+                type: string
+        '400':
+          description: Ошибка при удалении пользователя
+          schema:
+            type: object
+            properties:
+              Error:
+                type: string
