@@ -17,10 +17,10 @@ func (s *PostgresStorage) CreateRefUsersSegmentsTable() error {
     	date_del TIMESTAMP,
     	CONSTRAINT fk_users
 			FOREIGN KEY (user_id) 
-			REFERENCES users (id),
+			REFERENCES users (id) ON  DELETE  CASCADE,
     	CONSTRAINT fk_segment
 			FOREIGN KEY (segment_id) 
-			REFERENCES segment (id)
+			REFERENCES segment (id) ON  DELETE  CASCADE
     )`
 
 	_, err := s.db.Exec(query)
