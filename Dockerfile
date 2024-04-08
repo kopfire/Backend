@@ -38,10 +38,10 @@ WORKDIR /app
 COPY --from=builder /app/app .
 
 # Set any environment variables required by the application
-ENV HTTP_ADDR=:9999
+ENV HTTP_ADDR=:${APP_PORT}
 
 # Expose the port that the application listens on
-EXPOSE 9999
+EXPOSE ${APP_PORT}
 
 # Run the binary when the container starts
 CMD sleep 3
